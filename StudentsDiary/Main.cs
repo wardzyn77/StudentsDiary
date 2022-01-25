@@ -49,15 +49,21 @@ namespace StudentsDiary
         public Main()
         {
             InitializeComponent();
+            Group grupa = new Group();
+            grupa.MokGroup();
             _listGroupFromFile = fileHelperGroup.DeserialisedFromFile();
             RefreshDiary();
             if (IsMaximize)
                 WindowState = FormWindowState.Maximized;
             Text = "Dzienik uczniów";
+            SetHiddenColumn();
             SetGroupNameFromId();
             SetColumnLabel();
-            Group grupa = new Group();
-            grupa.MokGroup();
+        }
+
+        private void SetHiddenColumn()
+        {
+            dgvDiary.Columns["StudentGroupId"].Visible = false;
         }
 
         private void RefreshDiary()
@@ -82,32 +88,18 @@ namespace StudentsDiary
                 if (tmpGruop != null)
                     row.Cells["StudentGroupName"].Value = tmpGruop.GroupName;
             }
-                
         }
 
         private void FillComboGroup()
         {
-            //var lista = new List<string>() { "Wszystkie" };
-            //var where = new[] { 1, 3, 8 };
-            //var listSearch2 = _listGroupFromFile.Select(x => where.Contains(x.Id)).ToList();
-            //var listSearch3 = _listGroupFromFile.Select(x => where.Contains(x.Id)).ToList();
-            //var listaGroups = _studentListFromFile.Select(x => x.StudentGroupId).Where(x => x != null).Distinct().ToList();
-            //var listSearch4 = _listGroupFromFile.Select(x => where.Contains(x.Id)).ToList();
-            //var listSearch = _listGroupFromFile.Select(x => listaGroups.Contains(x.Id)).ToList();
             var listaGroupStudents = _studentListFromFile.Select(x => x.StudentGroupId).Where(x => x != null).Distinct().ToList();
-            //var listSearch5 = _listGroupFromFile.Select(x => listaGroup.Contains(x.Id)).ToList();
-            //var listSearch6 = _listGroupFromFile.Select(x => x.Id == 3 || x.Id == 6 || x.Id == 8).ToList();
             var listSearch = _listGroupFromFile.Select(x => x).Where(x => listaGroupStudents.Contains(x.Id)).ToList();
-            //var listSearch8 = _listGroupFromFile.Select(x => x).Where(x => x.Id == 3 || x.Id == 6 || x.Id == 8).ToList();
-            //var listSearch9 = _listGroupFromFile.Select(x => x).ToList();
             var list = new List<Group>();
             var gr0 = new Group() { Id = 0, GroupName = "Wszystkie" };
             list.Add(gr0);
             list.AddRange(listSearch);
-            //var listaGroup = _studentListFromFile.Select(x => x.StudentGroupName).Where(x => x != null).Where(x => x.Length > 0).Distinct();
-            //lista.AddRange(listaGroups);
             cmbFiltrGroup.DataSource = list;
-            cmbFiltrGroup.DisplayMember = "GroupName";
+            cmbFiltrGroup.DisplayMember = "SearchGroupName";
             cmbFiltrGroup.ValueMember = "Id";
             cmbFiltrGroup.SelectedIndex = -1;
         }
@@ -187,7 +179,6 @@ namespace StudentsDiary
             dgvDiary.Columns["AdditionalActivities"].HeaderText = "zajęcia dodatkowe";
             dgvDiary.Columns["Comments"].HeaderText = "Uwagi";
             dgvDiary.Columns["StudentGroupName"].HeaderText = "Grupa";
-            dgvDiary.Columns["StudentGroupId"].Visible = false;
         }
 
         private void SetGroupNameFromId()
