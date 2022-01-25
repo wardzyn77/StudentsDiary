@@ -19,7 +19,7 @@ namespace StudentsDiary
         private FileHelper<List<Group>> fileHelperGroup = new FileHelper<List<Group>>(Program.FilePathGroup);
         private int _studentId;
         private bool flIsGroupNameColumn = false;
-        private List<Student> _listFromFile;
+        private List<Student> _studentListFromFile;
         private List<Group> _listGroupFromFile;
 
         public static Color FontColor
@@ -49,25 +49,25 @@ namespace StudentsDiary
         public Main()
         {
             InitializeComponent();
+            _listGroupFromFile = fileHelperGroup.DeserialisedFromFile();
             RefreshDiary();
-            //MokInitializeStudents();
             if (IsMaximize)
                 WindowState = FormWindowState.Maximized;
             Text = "Dzienik uczniów";
+            SetGroupNameFromId();
             SetColumnLabel();
             Group grupa = new Group();
             grupa.MokGroup();
-            SetGroupNameFromId();
         }
 
         private void RefreshDiary()
         {
-            _listFromFile = fileHelper.DeserialisedFromFile();
+            _studentListFromFile = fileHelper.DeserialisedFromFile();
             var listStudent = new List<Student>();
             if (cmbFiltrGroup.SelectedValue == null || cmbFiltrGroup.SelectedValue.ToString() == "Wszystkie" || cmbFiltrGroup.SelectedValue.ToString().Length == 0)
-                listStudent = _listFromFile.OrderBy(x => x.Id).ToList();
+                listStudent = _studentListFromFile.OrderBy(x => x.Id).ToList();
             else
-                listStudent = _listFromFile.OrderBy(x => x.Id).Where(x => x.StudentGroupName == cmbFiltrGroup.SelectedValue.ToString()).ToList();
+                listStudent = _studentListFromFile.OrderBy(x => x.Id).Where(x => x.StudentGroupId == Convert.ToInt32(cmbFiltrGroup.SelectedValue.ToString())).ToList();
             dgvDiary.DataSource = listStudent;
             FillComboGroup();
             if (flIsGroupNameColumn)
@@ -76,25 +76,39 @@ namespace StudentsDiary
 
         private void FillColumnGroupName()
         {
-            _listGroupFromFile = fileHelperGroup.DeserialisedFromFile();
             foreach (DataGridViewRow row in dgvDiary.Rows)
             {
                 var tmpGruop = _listGroupFromFile.FirstOrDefault(x => x.Id.ToString() == row.Cells["StudentGroupId"].Value.ToString());
                 if (tmpGruop != null)
-                    row.Cells["GroupName"].Value = tmpGruop.GroupName;
+                    row.Cells["StudentGroupName"].Value = tmpGruop.GroupName;
             }
                 
         }
 
         private void FillComboGroup()
         {
-            //_listGroupFromFile
-            var lista = new List<string>() { "Wszystkie" };
-            var listaGroup = _listFromFile.Select(x => x.StudentGroupName).Where(x => x != null).Where(x => x.Length > 0).Distinct();
-            //var lista2 = _listFromFile.Select(x)
-            lista.AddRange(listaGroup);
-            cmbFiltrGroup.DataSource = lista;
-            cmbFiltrGroup.DisplayMember = "StudentGroupName";
+            //var lista = new List<string>() { "Wszystkie" };
+            //var where = new[] { 1, 3, 8 };
+            //var listSearch2 = _listGroupFromFile.Select(x => where.Contains(x.Id)).ToList();
+            //var listSearch3 = _listGroupFromFile.Select(x => where.Contains(x.Id)).ToList();
+            //var listaGroups = _studentListFromFile.Select(x => x.StudentGroupId).Where(x => x != null).Distinct().ToList();
+            //var listSearch4 = _listGroupFromFile.Select(x => where.Contains(x.Id)).ToList();
+            //var listSearch = _listGroupFromFile.Select(x => listaGroups.Contains(x.Id)).ToList();
+            var listaGroupStudents = _studentListFromFile.Select(x => x.StudentGroupId).Where(x => x != null).Distinct().ToList();
+            //var listSearch5 = _listGroupFromFile.Select(x => listaGroup.Contains(x.Id)).ToList();
+            //var listSearch6 = _listGroupFromFile.Select(x => x.Id == 3 || x.Id == 6 || x.Id == 8).ToList();
+            var listSearch = _listGroupFromFile.Select(x => x).Where(x => listaGroupStudents.Contains(x.Id)).ToList();
+            //var listSearch8 = _listGroupFromFile.Select(x => x).Where(x => x.Id == 3 || x.Id == 6 || x.Id == 8).ToList();
+            //var listSearch9 = _listGroupFromFile.Select(x => x).ToList();
+            var list = new List<Group>();
+            var gr0 = new Group() { Id = 0, GroupName = "Wszystkie" };
+            list.Add(gr0);
+            list.AddRange(listSearch);
+            //var listaGroup = _studentListFromFile.Select(x => x.StudentGroupName).Where(x => x != null).Where(x => x.Length > 0).Distinct();
+            //lista.AddRange(listaGroups);
+            cmbFiltrGroup.DataSource = list;
+            cmbFiltrGroup.DisplayMember = "GroupName";
+            cmbFiltrGroup.ValueMember = "Id";
             cmbFiltrGroup.SelectedIndex = -1;
         }
         private List<Student> MokInitializeStudents()
@@ -179,8 +193,8 @@ namespace StudentsDiary
         private void SetGroupNameFromId()
         {
             DataGridViewColumn txbGroupName = new DataGridViewTextBoxColumn();
-            txbGroupName.Name = "GroupName";
-            txbGroupName.DataPropertyName = "GroupName";
+            txbGroupName.Name = "StudentGroupName";
+            txbGroupName.DataPropertyName = "StudentGroupName";
             dgvDiary.Columns.Add(txbGroupName);
             flIsGroupNameColumn = true;
             FillColumnGroupName();

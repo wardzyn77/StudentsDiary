@@ -21,7 +21,7 @@ namespace StudentsDiary
         {
             InitializeComponent();
             _studentId = id;
-            FillComboGroup();
+            InitializeComboGroup();
             if (_studentId != 0)
             {
                 Text = "Edytuj dane Studenta";
@@ -31,7 +31,7 @@ namespace StudentsDiary
             txbFirstName.Focus();
         }
 
-        private void FillComboGroup()
+        private void InitializeComboGroup()
         {
             var lista = new List<Group>();
             lista = fileHelperGroup.DeserialisedFromFile();
@@ -57,7 +57,6 @@ namespace StudentsDiary
             cbAdditionalActivities.Checked = student.AdditionalActivities;
             if (student.StudentGroupId != null)
                 cmbGroup.SelectedValue = student.StudentGroupId;
-            //cmbGroup.SelectedText = student.StudentGroupName;
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -95,7 +94,6 @@ namespace StudentsDiary
                 History = txbHistory.Text,
                 AdditionalActivities = cbAdditionalActivities.Checked,
                 StudentGroupId = Convert.ToInt32(cmbGroup.SelectedValue)
-                //,StudentGroupName = groupName
             };
             return student;
         }

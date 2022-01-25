@@ -19,7 +19,7 @@ namespace StudentsDiary
         public string Comments { get; set; }
         public bool AdditionalActivities { get; set; }
         public int? StudentGroupId { get; set; }
-        public string StudentGroupName { get; set; }
+        //public string StudentGroupName { get; set; }
         //public Group StudentGroup { get; set; }
     }
 }
